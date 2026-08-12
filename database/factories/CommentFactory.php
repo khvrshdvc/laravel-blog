@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Comment;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +22,8 @@ class CommentFactory extends Factory
     {
         return [
             'body' => fake()->paragraph(5),
-            'user_id' => fake()->name(),
+            'user_id' => User::factory(),  
+            'post_id' => Post::factory(),
         ];
     }
 }

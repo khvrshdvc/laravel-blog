@@ -24,7 +24,7 @@ class PostFactory extends Factory
             'type_body' => fake()->word(),
             'short_body' => fake()->sentence(15),
             'body' => fake()->paragraph(5),
-            'user_id' => Auth::user()->id
+            'user_id' => User::factory(),
         ];
     }
 }
