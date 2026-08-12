@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @extends Factory<Post>
@@ -23,7 +24,7 @@ class PostFactory extends Factory
             'type_body' => fake()->word(),
             'short_body' => fake()->sentence(15),
             'body' => fake()->paragraph(5),
-            'user_id' => 1
+            'user_id' => Auth::user()->id
         ];
     }
 }
