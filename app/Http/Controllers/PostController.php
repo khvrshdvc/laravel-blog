@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-   
+
     public function index(Request $request)
     {
         $query = Post::query();
@@ -44,7 +44,6 @@ class PostController extends Controller
             $path = $request->file('image')->storeAs('post-images', $name, 'public');
         }
 
-
         $post = Post::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
@@ -53,6 +52,7 @@ class PostController extends Controller
             'body' => $request->body,
             'image' => $path ?? null,
         ]);
+
         PostCreated::dispatch($post);
 
         return redirect()->route('posts.index');
@@ -84,7 +84,6 @@ class PostController extends Controller
             $path = $request->file('image')->storeAs('post-images', $name, 'public');
         }
 
-
         $post->update([
             'title' => $request->title,
             'type_body' => $request->type_body,
@@ -99,11 +98,11 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         Gate::authorize('delete', $post);
-        
-        if(isset($post->image)){
+
+        if (isset($post->image)) {
             Storage::disk('public')->delete($post->image);
         }
-         
+
         $post->delete();
 
         return redirect()->route('posts.index');
