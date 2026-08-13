@@ -22,6 +22,6 @@ class SendEmailToUser
      */
     public function handle(PostCreated $event): void
     {
-        Log::alert("Post yaratildi". $event->post->title);
+         Log::info('Email yuborildi: '.'Post: ' . $event->post->title);
     }
 }

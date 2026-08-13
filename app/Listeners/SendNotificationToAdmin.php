@@ -22,6 +22,6 @@ class SendNotificationToAdmin
      */
     public function handle(PostCreated $event): void
     {
-        Log::alert("Post yaratildi!");
+        Log::info('Email yuborildi: '.'Post: ' . $event->post->title);
     }
 }
