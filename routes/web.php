@@ -13,7 +13,6 @@ Route::post('/authenticate', [AuthController::class, 'authenticate'])->name('aut
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('register', [AuthController::class, 'register_store'])->name('register.store');
-
 Route::get('/posts', [PostController::class, 'index'])
     ->name('posts.index');
 

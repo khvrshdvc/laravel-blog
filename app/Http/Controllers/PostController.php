@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PostCreated;
 use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class PostController extends Controller
         }
 
 
-        $posts = Post::create([
+        $post = Post::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
             'type_body' => $request->type_body,
@@ -52,6 +53,7 @@ class PostController extends Controller
             'body' => $request->body,
             'image' => $path ?? null,
         ]);
+        PostCreated::dispatch($post);
 
         return redirect()->route('posts.index');
     }
