@@ -15,6 +15,7 @@
             <a href="{{ route('posts.index') }}" class="back-link">&larr; cd ../posts</a>
             @auth
                 <div class="post-actions">
+                    @canany(['update', 'delet'], $post) 
                     <a href="{{ route('posts.edit', ['post' => $post->id]) }}" class="btn-edit">
                         Tahrirlash
                     </a>
@@ -25,6 +26,7 @@
                         <button type="submit" class="btn-delete">O'chirish</button>
                     </form>
                 </div>
+                @endcanany
             @endauth
 
             <div class="post-content">

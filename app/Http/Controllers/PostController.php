@@ -6,6 +6,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
@@ -62,11 +63,15 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
+        Gate::authorize('update', $post);
+
         return view('posts.edit')->with(['post' => $post]);
     }
 
     public function update(StorePostRequest $request, Post $post)
     {
+        Gate::authorize('update', $post);
+
         if ($request->hasFile('image')) {
 
             if (isset($post->image)) {
@@ -91,15 +96,14 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-
+        Gate::authorize('delete', $post);
         
         if(isset($post->image)){
             Storage::disk('public')->delete($post->image);
         }
-
+         
         $post->delete();
 
-        
         return redirect()->route('posts.index');
     }
 }
