@@ -42,7 +42,9 @@
                 <a href="{{ route('posts.show', $post->id) }}" class="read-more">o'qish →</a>
             </div>
             <span class="post-id">#{{ $post->id }}</span>
-            <img src="{{ asset('storage/' . $post->image) }}" alt="..." class="thumb-square">
+            @if ($post->image)
+                <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" class="thumb-square">
+            @endif
         </article>
     @endforeach
     <div class="pagination-wrap">

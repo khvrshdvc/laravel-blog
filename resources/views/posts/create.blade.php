@@ -20,22 +20,19 @@
                 <label for="short_body">xulosa</label>
                 <input type="text" id="short_body" name="short_body" placeholder="Kichik xulosa"
                     value="{{ old('short_body') }}">
-               @error('type_body')
+                @error('short_body')
                     <div class="compact-hint">{{ $message }}</div>
                 @enderror
             </div>
             <div class="form-group">
                 <label for="type_body">mavzu</label>
                 <select id="type_body" name="type_body">
-                    <option value="" disabled selected>Mavzuni tanlang</option>
-                    <option value="Laravel">Laravel</option>
-                    <option value="PHP">PHP</option>
-                    <option value="MySQL">MySQL</option>
-                    <option value="Docker">Docker</option>
-                    <option value="Git">Git</option>
-                    <option value="Boshqa">Boshqa</option>
+                    <option value="" disabled @selected(!old('type_body'))>Mavzuni tanlang</option>
+                    @foreach (['Laravel', 'PHP', 'MySQL', 'Docker', 'Git', 'Boshqa'] as $topic)
+                        <option value="{{ $topic }}" @selected(old('type_body') === $topic)>{{ $topic }}</option>
+                    @endforeach
                 </select>
-                @error('short_body')
+                @error('type_body')
                     <div class="compact-hint">{{ $message }}</div>
                 @enderror
             </div>
@@ -54,7 +51,7 @@
 
             <div class="form-group">
                 <label for="body">matn</label>
-                <textarea id="body" name="body" placeholder="Post matnini shu yerga yozing..." value="{{ old('body') }}"></textarea>
+                <textarea id="body" name="body" placeholder="Post matnini shu yerga yozing...">{{ old('body') }}</textarea>
                 @error('body')
                     <div class="compact-hint">{{ $message }}</div>
                 @enderror

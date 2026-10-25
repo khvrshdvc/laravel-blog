@@ -25,7 +25,7 @@ class StorePostRequest extends FormRequest
     {
         return [
             "title" => 'required',
-            'type_body' => 'required',
+            'type_body' => 'required|max:20|in:Laravel,PHP,MySQL,Docker,Git,Boshqa',
             'short_body' => 'required',
             'body' => 'required',
             'image' => 'nullable|image|mimes:jpg,png|max:2048',
@@ -36,8 +36,10 @@ class StorePostRequest extends FormRequest
     {
         return [
             'title.required' => 'sarlavha to\'ldirish majburiy!',
-            'type_body.required' => 'xulosa to\'ldirish majburiy!',
-            'short_body.required' => 'mavzu to\'ldirish majburiy!',
+            'type_body.required' => 'mavzu to\'ldirish majburiy!',
+            'type_body.in' => 'mavzu ro\'yxatdan tanlanishi kerak!',
+            'type_body.max' => 'mavzu 20 belgidan oshmasligi kerak!',
+            'short_body.required' => 'xulosa to\'ldirish majburiy!',
             'body.required' => 'matn to\'ldirish majburiy!',
             'image.image' => 'rasm ko\'rinishida bo\'lishi majburiy!'
         ];

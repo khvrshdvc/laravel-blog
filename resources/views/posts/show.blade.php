@@ -1,6 +1,8 @@
 <x-layout title="Post">
     <div class="hero-post-image">
-        <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}">
+        @if ($post->image)
+            <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}">
+        @endif
         <div class="hero-post-overlay">
             <div class="post-meta">
                 <span>{{ $post->created_at->diffForHumans() }} </span>
@@ -13,21 +15,23 @@
     <main>
         <article class="hero-post-body">
             <a href="{{ route('posts.index') }}" class="back-link">&larr; cd ../posts</a>
-            @auth
+            @canany(['update', 'delete'], $post)
                 <div class="post-actions">
-                    @canany(['update', 'delet'], $post) 
-                    <a href="{{ route('posts.edit', ['post' => $post->id]) }}" class="btn-edit">
-                        Tahrirlash
-                    </a>
-                    <form action="{{ route('posts.destroy', ['post' => $post->id]) }}" method="POST"
-                        onsubmit="return confirm('Postni o\'chirishga ishonchingiz komilmi?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn-delete">O'chirish</button>
-                    </form>
+                    @can('update', $post)
+                        <a href="{{ route('posts.edit', ['post' => $post->id]) }}" class="btn-edit">
+                            Tahrirlash
+                        </a>
+                    @endcan
+                    @can('delete', $post)
+                        <form action="{{ route('posts.destroy', ['post' => $post->id]) }}" method="POST"
+                            onsubmit="return confirm('Postni o\'chirishga ishonchingiz komilmi?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-delete">O'chirish</button>
+                        </form>
+                    @endcan
                 </div>
-                @endcanany
-            @endauth
+            @endcanany
 
             <div class="post-content">
                 <p>{{ $post->body }}</p>
@@ -38,7 +42,7 @@
     </main>
     <section class="comments-section">
 
-        <div class="section-label">// Izohlar ({{ $post->comments()->count() }})</div>
+        <div class="section-label">// Izohlar ({{ $post->comments->count() }})</div>
         @auth
 
             @foreach ($post->comments as $comment)

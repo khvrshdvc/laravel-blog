@@ -24,9 +24,9 @@ class PostController extends Controller
         $posts = $query->latest()->paginate(10);
 
         $totalPosts = Post::count();
-        $totalTopics = Post::distinct('type_body')->count('type_body');
         $startYear = Post::oldest()->value('created_at')?->format('Y') ?? date('Y');
         $topics = Post::select('type_body')->distinct()->pluck('type_body');
+        $totalTopics = $topics->count();
 
         return view('posts.index', compact('posts', 'totalPosts', 'totalTopics', 'startYear', 'topics'));
     }
@@ -40,8 +40,7 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         if ($request->hasFile('image')) {
-            $name = $request->file('image')->getClientOriginalName();
-            $path = $request->file('image')->storeAs('post-images', $name, 'public');
+            $path = $request->file('image')->store('post-images', 'public');
         }
 
         $post = Post::create([
@@ -60,6 +59,8 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
+        $post->load('comments.user');
+
         return view('posts.show')->with(['post' => $post]);
     }
 
@@ -80,8 +81,7 @@ class PostController extends Controller
                 Storage::disk('public')->delete($post->image);
             }
 
-            $name = $request->file('image')->getClientOriginalName();
-            $path = $request->file('image')->storeAs('post-images', $name, 'public');
+            $path = $request->file('image')->store('post-images', 'public');
         }
 
         $post->update([
