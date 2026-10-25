@@ -1,59 +1,117 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Blog
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A personal blog built with Laravel 12 and PostgreSQL. Users can register, write posts with cover images, filter posts by topic and leave comments. The interface is in Uzbek.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Posts:** create, edit and delete posts with a title, summary, topic, body and an optional image (jpg/png, up to 2 MB)
+- **Topics:** filter the post list by topic (Laravel, PHP, MySQL, Docker, Git, Boshqa)
+- **Comments:** logged-in users can comment on any post
+- **Authentication:** register, log in with "remember me", log out
+- **Authorization:** only the author of a post can edit or delete it (`PostPolicy`)
+- **Rate limiting:** login is limited to 5 attempts per minute per email and 10 per IP; registration to 3 per minute per IP
+- **Events:** creating a post fires a `PostCreated` event, handled by the `SendEmailToUser` and `SendNotificationToAdmin` listeners
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.5, Laravel 12
+- PostgreSQL 18
+- Blade templates, Vite, Tailwind CSS 4
+- Docker via [Laravel Sail](https://laravel.com/docs/sail)
 
-## Learning Laravel
+## Getting started
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+You need Docker. You don't need PHP, Composer or Node installed locally; everything runs in containers.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone https://github.com/khvrshdvc/laravel-blog.git
+cd laravel-blog
 
-## Laravel Sponsors
+# Install PHP dependencies (uses a throwaway Composer container)
+docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html \
+    laravelsail/php84-composer:latest composer install --ignore-platform-reqs
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Create your env file, then set DB_PASSWORD in it
+cp .env.example .env
 
-### Premium Partners
+# Start the app and database
+./vendor/bin/sail up -d
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Finish setup
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate --seed
+./vendor/bin/sail artisan storage:link
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
+```
 
-## Contributing
+Open **http://localhost:8080**.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The seeder creates sample users, posts and comments. Every seeded user's password is `password`.
 
-## Code of Conduct
+### Ports
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Service | Default port | `.env` variable |
+| --- | --- | --- |
+| App | 8080 | `APP_PORT` |
+| Vite dev server | 5174 | `VITE_PORT` |
+| PostgreSQL | 5432 | `FORWARD_DB_PORT` |
 
-## Security Vulnerabilities
+Change these in `.env` if they clash with other projects, then run `sail up -d` again.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Everyday commands
 
-## License
+Tip: add `alias sail='./vendor/bin/sail'` to your shell config.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+sail up -d                       # start
+sail stop                        # stop
+sail npm run dev                 # live-reload CSS/JS while editing
+sail artisan migrate:fresh --seed  # reset the database with sample data
+sail artisan test                # run the test suite
+```
+
+## Tests
+
+Feature tests cover authentication, posts and comments (`tests/Feature`). They run against a separate `testing` database that the Sail Postgres container creates on first start, so your local data isn't touched.
+
+```bash
+sail artisan test
+```
+
+## Project structure
+
+```
+app/
+├── Events/PostCreated.php
+├── Http/
+│   ├── Controllers/   AuthController, PostController, CommentController, PageController
+│   └── Requests/      LoginRequest, RegisterRequest, StorePostRequest
+├── Listeners/         SendEmailToUser, SendNotificationToAdmin
+├── Models/            User, Post, Comment
+├── Policies/PostPolicy.php
+└── Providers/AppServiceProvider.php   (rate limiters)
+resources/views/       Blade views (auth, posts, components)
+routes/web.php         all routes
+tests/Feature/         AuthTest, PostTest, CommentTest
+```
+
+## Routes
+
+| Method | URL | Access | Description |
+| --- | --- | --- | --- |
+| GET | `/` | public | Home page |
+| GET | `/contact` | public | Contact page |
+| GET | `/posts` | public | Post list (`?tag=` filters by topic) |
+| GET | `/posts/{post}` | public | Single post with comments |
+| GET / POST | `/login`, `/authenticate` | guests | Log in |
+| GET / POST | `/register` | guests | Register |
+| POST | `/logout` | logged in | Log out |
+| GET / POST | `/posts/create`, `/posts` | logged in | Create a post |
+| GET / PUT | `/posts/{post}/edit`, `/posts/{post}` | author | Edit a post |
+| DELETE | `/posts/{post}` | author | Delete a post |
+| POST | `/comments` | logged in | Add a comment |
+
+## Author
+
+Utkirbek ([@khvrshdvc](https://github.com/khvrshdvc))
